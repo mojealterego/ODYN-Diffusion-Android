@@ -30,6 +30,8 @@ class NativeEngineBridge implements GenerationEngine {
     final output = await _channel.invokeMethod<String>('generate', {
       'prompt': request.prompt,
       'modelPath': request.model.modelPath,
+      'vaePath': request.model.vaePath,
+      'textEncoderPath': request.model.textEncoderPath,
       'width': request.width,
       'height': request.height,
       'steps': request.steps,
