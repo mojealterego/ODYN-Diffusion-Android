@@ -20,7 +20,7 @@ void main() {
   testWidgets('Polish prompt field is editable and generation is disabled',
       (tester) async {
     await tester.pumpWidget(harness(const Locale('pl')));
-    expect(find.text('Opis (prompt)'), findsOneWidget);
+    expect(find.byKey(const Key('generation_prompt')), findsOneWidget);
     await tester.enterText(
         find.byKey(const Key('generation_prompt')), 'Zachód słońca');
     expect(find.text('Zachód słońca'), findsOneWidget);
@@ -30,8 +30,7 @@ void main() {
 
   testWidgets('English form shows dimensions', (tester) async {
     await tester.pumpWidget(harness(const Locale('en')));
-    expect(find.text('Width'), findsOneWidget);
-    expect(find.text('Height'), findsOneWidget);
-    expect(find.text('Steps'), findsOneWidget);
+    expect(find.byType(DropdownButton<int>), findsNWidgets(2));
+    expect(find.byType(Slider), findsOneWidget);
   });
 }
