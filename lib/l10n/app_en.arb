@@ -20,7 +20,7 @@
   "height": "Height",
   "steps": "Steps",
   "demoModel": "Demo model",
-  "noModelSelected": "No model selected. Model import is coming.",
+  "noModelSelected": "No models imported yet.",
   "selectModelFirst": "Select a model before generating.",
   "importModel": "Import model",
   "importingModel": "Importing model…",
