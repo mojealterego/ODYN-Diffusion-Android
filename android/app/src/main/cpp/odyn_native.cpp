@@ -11,6 +11,7 @@
 namespace {
 std::mutex generation_mutex;
 std::atomic<sd_ctx_t*> active_context{nullptr};
+std::mutex cancel_mutex;
 
 bool write_ppm(const char* path, const sd_image_t& image) {
   if (!image.data || image.channel < 3 || !image.width || !image.height) return false;
@@ -60,7 +61,7 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
   sd_ctx_t* ctx = new_sd_ctx(&context_params);
   jstring result = nullptr;
   if (ctx && sd_ctx_supports_image_generation(ctx)) {
-    active_context.store(ctx);
+    { std::lock_guard<std::mutex> guard(cancel_mutex); active_context.store(ctx); }
     sd_img_gen_params_t params{};
     sd_img_gen_params_init(&params);
     params.prompt = text;
@@ -78,7 +79,7 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
       for (int i = 0; i < count; ++i) free(images[i].data);
       free(images);
     }
-    active_context.store(nullptr);
+    { std::lock_guard<std::mutex> guard(cancel_mutex); active_context.store(nullptr); }
   }
   if (ctx) free_sd_ctx(ctx);
   env->ReleaseStringUTFChars(model_path, model);
@@ -90,6 +91,7 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
 extern "C" JNIEXPORT void JNICALL
 Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeCancel(
     JNIEnv*, jobject) {
+  std::lock_guard<std::mutex> guard(cancel_mutex);
   sd_ctx_t* ctx = active_context.load();
   if (ctx) sd_cancel_generation(ctx, SD_CANCEL_ALL);
 }
