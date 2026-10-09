@@ -19,4 +19,4 @@ add_subdirectory("${SDCPP_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/sdcpp")
 
 add_library(odyn_native SHARED odyn_native.cpp)
 target_include_directories(odyn_native PRIVATE "${SDCPP_SOURCE_DIR}/include")
-target_link_libraries(odyn_native PRIVATE stable-diffusion log)
+target_link_libraries(odyn_native PRIVATE stable-diffusion log z)
