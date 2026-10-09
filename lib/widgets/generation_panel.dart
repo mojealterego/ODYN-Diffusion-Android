@@ -153,12 +153,22 @@ class _GenerationPanelState extends State<GenerationPanel> {
           icon: const Icon(Icons.play_arrow),
           label: Text(t.generate),
         ),
-        if (running) const LinearProgressIndicator(),
+        if (running) ...[
+          const LinearProgressIndicator(),
+          TextButton.icon(
+            onPressed: () async {
+              try { await engine.cancel(); }
+              catch (e) { if (mounted) setState(() => error = e.toString()); }
+            },
+            icon: const Icon(Icons.stop),
+            label: const Text('Cancel'),
+          ),
+        ],
         if (!available) Text(t.notReady, textAlign: TextAlign.center),
         if (error != null) SelectableText(error!),
         if (outputPath != null) ...[
           SelectableText(outputPath!),
-          if (!widget.isVideo && outputPath!.toLowerCase().endsWith('.png'))
+          if (!widget.isVideo && (outputPath!.toLowerCase().endsWith('.png') || outputPath!.toLowerCase().endsWith('.ppm')))
             Image.file(File(outputPath!), errorBuilder: (_, __, ___) =>
               SelectableText(outputPath!)),
         ],
