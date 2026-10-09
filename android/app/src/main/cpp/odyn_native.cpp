@@ -6,6 +6,8 @@
 #include <mutex>
 #include <atomic>
 #include <string>
+#include <vector>
+#include <zlib.h>
 #include "stable-diffusion.h"
 
 namespace {
@@ -13,20 +15,49 @@ std::mutex generation_mutex;
 std::atomic<sd_ctx_t*> active_context{nullptr};
 std::mutex cancel_mutex;
 
-bool write_ppm(const char* path, const sd_image_t& image) {
+void write_u32(std::vector<uint8_t>& bytes, uint32_t value) {
+  for (int shift = 24; shift >= 0; shift -= 8) bytes.push_back(static_cast<uint8_t>(value >> shift));
+}
+
+void png_chunk(std::vector<uint8_t>& png, const char* tag, const std::vector<uint8_t>& payload) {
+  write_u32(png, static_cast<uint32_t>(payload.size()));
+  const size_t offset = png.size();
+  png.insert(png.end(), tag, tag + 4);
+  png.insert(png.end(), payload.begin(), payload.end());
+  const uLong checksum = crc32(0L, png.data() + offset, static_cast<uInt>(png.size() - offset));
+  write_u32(png, static_cast<uint32_t>(checksum));
+}
+
+bool write_png(const char* path, const sd_image_t& image) {
   if (!image.data || image.channel < 3 || !image.width || !image.height) return false;
-  FILE* file = fopen(path, "wb");
-  if (!file) return false;
-  bool ok = fprintf(file, "P6\n%u %u\n255\n", image.width, image.height) > 0;
-  for (uint32_t y = 0; ok && y < image.height; ++y) {
-    for (uint32_t x = 0; ok && x < image.width; ++x) {
+  const size_t stride = static_cast<size_t>(image.width) * 3;
+  std::vector<uint8_t> raw((stride + 1) * image.height);
+  for (uint32_t y = 0; y < image.height; ++y) {
+    const size_t row = static_cast<size_t>(y) * (stride + 1);
+    raw[row] = 0;
+    for (uint32_t x = 0; x < image.width; ++x) {
       const uint8_t* pixel = image.data + (static_cast<size_t>(y) * image.width + x) * image.channel;
-      ok = fwrite(pixel, 1, 3, file) == 3;
+      for (int c = 0; c < 3; ++c) raw[row + 1 + static_cast<size_t>(x) * 3 + c] = pixel[c];
     }
   }
-  ok = fclose(file) == 0 && ok;
-  if (!ok) remove(path);
-  return ok;
+  uLongf compressed_size = compressBound(static_cast<uLong>(raw.size()));
+  std::vector<uint8_t> compressed(compressed_size);
+  if (compress2(compressed.data(), &compressed_size, raw.data(), static_cast<uLong>(raw.size()), Z_BEST_SPEED) != Z_OK) return false;
+  compressed.resize(compressed_size);
+  std::vector<uint8_t> png = {137, 80, 78, 71, 13, 10, 26, 10};
+  std::vector<uint8_t> ihdr;
+  write_u32(ihdr, image.width);
+  write_u32(ihdr, image.height);
+  ihdr.insert(ihdr.end(), {8, 2, 0, 0, 0});
+  png_chunk(png, "IHDR", ihdr);
+  png_chunk(png, "IDAT", compressed);
+  png_chunk(png, "IEND", {});
+  FILE* file = fopen(path, "wb");
+  if (!file) return false;
+  const bool ok = fwrite(png.data(), 1, png.size(), file) == png.size();
+  const bool closed = fclose(file) == 0;
+  if (!ok || !closed) remove(path);
+  return ok && closed;
 }
 }
 
@@ -73,7 +104,7 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
     sd_image_t* images = nullptr;
     int count = 0;
     if (generate_image(ctx, &params, &images, &count) && images && count > 0) {
-      if (write_ppm(output, images[0])) result = env->NewStringUTF(output);
+      if (write_png(output, images[0])) result = env->NewStringUTF(output);
     }
     if (images) {
       for (int i = 0; i < count; ++i) free(images[i].data);
