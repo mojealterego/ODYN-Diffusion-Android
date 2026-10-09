@@ -54,5 +54,21 @@ flutter gen-l10n
 flutter analyze lib test
 flutter test
 flutter build apk --debug --target-platform android-arm64
+apk="build/app/outputs/flutter-apk/app-debug.apk"
+test -s "$apk" || { echo "APK was not produced or is empty" >&2; exit 1; }
+python3 - <<'PY'
+from pathlib import Path
+from zipfile import ZipFile
+apk = Path("build/app/outputs/flutter-apk/app-debug.apk")
+with ZipFile(apk) as z:
+    bad = z.testzip()
+    if bad:
+        raise SystemExit(f"Corrupt APK member: {bad}")
+    names = set(z.namelist())
+    for required in ("lib/arm64-v8a/libflutter.so", "lib/arm64-v8a/libapp.so", "lib/arm64-v8a/libodyn_native.so"):
+        if required not in names:
+            raise SystemExit(f"Missing required ARM64 library: {required}")
+print("APK ZIP integrity and required ARM64 native libraries: OK")
+PY
 printf '\nAPK: %s\n' "build/app/outputs/flutter-apk/app-debug.apk"
 sha256sum build/app/outputs/flutter-apk/app-debug.apk
