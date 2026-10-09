@@ -7,6 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : FlutterActivity() {
@@ -59,7 +60,8 @@ class MainActivity : FlutterActivity() {
                                 result.error("ENGINE_BUSY", "Generation already in progress", null)
                             } else {
                                 val output = File(filesDir, "odyn-${System.nanoTime()}.png")
-                                worker.execute {
+                                try {
+                                  worker.execute {
                                     try {
                                         val path = nativeGenerateImage(model, vaePath, textEncoderPath, prompt, width, height, steps, seed, output.absolutePath)
                                         mainHandler.post {
@@ -73,6 +75,10 @@ class MainActivity : FlutterActivity() {
                                             result.error("INFERENCE_FAILED", e.message, null)
                                         }
                                     }
+                                  }
+                                } catch (e: RejectedExecutionException) {
+                                    generating.set(false)
+                                    result.error("ENGINE_SHUTDOWN", "Generation worker unavailable", null)
                                 }
                             }
                         }
