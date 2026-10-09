@@ -1,0 +1,18 @@
+{
+  "@@locale": "de",
+  "title": "ODYN Diffusion",
+  "image": "Bild",
+  "video": "Video",
+  "models": "Modelle",
+  "settings": "Einstellungen",
+  "language": "Sprache",
+  "systemLanguage": "Systemsprache",
+  "prompt": "Prompt",
+  "generate": "Generieren",
+  "notReady": "Die native Inferenz-Engine ist noch nicht verbunden.",
+  "polish": "Polski",
+  "english": "English",
+  "german": "Deutsch",
+  "spanish": "Español",
+  "french": "Français"
+}
