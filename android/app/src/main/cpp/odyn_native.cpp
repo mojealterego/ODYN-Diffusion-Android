@@ -68,24 +68,30 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeLibraryLoaded(
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
-    JNIEnv* env, jobject, jstring model_path, jstring prompt,
+    JNIEnv* env, jobject, jstring model_path, jstring vae_path, jstring text_encoder_path, jstring prompt,
     jint width, jint height, jint steps, jlong seed, jstring output_path) {
   if (!model_path || !prompt || !output_path || width < 64 || height < 64 ||
       width > 2048 || height > 2048 || width % 8 || height % 8 ||
       steps < 1 || steps > 150) return nullptr;
   const char* model = env->GetStringUTFChars(model_path, nullptr);
   const char* text = env->GetStringUTFChars(prompt, nullptr);
+  const char* vae = vae_path ? env->GetStringUTFChars(vae_path, nullptr) : nullptr;
+  const char* encoder = text_encoder_path ? env->GetStringUTFChars(text_encoder_path, nullptr) : nullptr;
   const char* output = env->GetStringUTFChars(output_path, nullptr);
-  if (!model || !text || !output) {
+  if (!model || !text || !output || (vae_path && !vae) || (text_encoder_path && !encoder)) {
     if (model) env->ReleaseStringUTFChars(model_path, model);
     if (text) env->ReleaseStringUTFChars(prompt, text);
     if (output) env->ReleaseStringUTFChars(output_path, output);
+    if (vae) env->ReleaseStringUTFChars(vae_path, vae);
+    if (encoder) env->ReleaseStringUTFChars(text_encoder_path, encoder);
     return nullptr;
   }
   std::lock_guard<std::mutex> lock(generation_mutex);
   sd_ctx_params_t context_params{};
   sd_ctx_params_init(&context_params);
   context_params.model_path = model;
+  context_params.vae_path = vae;
+  context_params.clip_l_path = encoder;
   context_params.n_threads = 4;
   context_params.enable_mmap = true;
   sd_ctx_t* ctx = new_sd_ctx(&context_params);
@@ -112,6 +118,8 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
   env->ReleaseStringUTFChars(model_path, model);
   env->ReleaseStringUTFChars(prompt, text);
   env->ReleaseStringUTFChars(output_path, output);
+  if (vae) env->ReleaseStringUTFChars(vae_path, vae);
+  if (encoder) env->ReleaseStringUTFChars(text_encoder_path, encoder);
   return result;
 }
 
