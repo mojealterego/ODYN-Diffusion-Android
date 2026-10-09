@@ -105,10 +105,7 @@ Java_com_mojealterego_odyn_1diffusion_1android_MainActivity_nativeGenerateImage(
     if (generate_image(ctx, &params, &images, &count) && images && count > 0) {
       if (write_png(output, images[0])) result = env->NewStringUTF(output);
     }
-    if (images) {
-      for (int i = 0; i < count; ++i) free(images[i].data);
-      free(images);
-    }
+    if (images) free_sd_images(images, count);
     { std::lock_guard<std::mutex> guard(cancel_mutex); active_context = nullptr; }
   }
   if (ctx) free_sd_ctx(ctx);
