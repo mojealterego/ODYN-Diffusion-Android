@@ -20,7 +20,7 @@
   "height": "Wysokość",
   "steps": "Kroki",
   "demoModel": "Model demonstracyjny",
-  "noModelSelected": "Nie wybrano modelu. Import modeli zostanie dodany.",
+  "noModelSelected": "Nie zaimportowano jeszcze żadnego modelu.",
   "selectModelFirst": "Wybierz model przed generowaniem.",
   "importModel": "Importuj model",
   "importingModel": "Importowanie modelu…",
