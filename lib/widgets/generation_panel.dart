@@ -46,13 +46,13 @@ class _GenerationPanelState extends State<GenerationPanel> {
         Row(children: [
           Expanded(child: Text(t.steps)),
           Text('$steps'),
-          Slider(
+          Expanded(child: Slider(
             value: steps.toDouble(),
             min: 1,
             max: 50,
             divisions: 49,
             onChanged: (v) => setState(() => steps = v.round()),
-          ),
+          )),
         ]),
         const SizedBox(height: 20),
         FilledButton.icon(
