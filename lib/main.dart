@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
+import 'widgets/generation_panel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,7 +77,6 @@ class _OdynHomeState extends State<OdynHome> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final labels = [t.image, t.video, t.models, t.settings];
     return Scaffold(
       appBar: AppBar(title: Text(t.title)),
       body: selectedTab == 3
@@ -106,11 +106,9 @@ class _OdynHomeState extends State<OdynHome> {
               ),
             ),
           ])
-        : Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(labels[selectedTab], style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 16),
-            Text(t.notReady, textAlign: TextAlign.center),
-          ])),
+        : selectedTab == 0 || selectedTab == 1
+          ? GenerationPanel(isVideo: selectedTab == 1)
+          : Center(child: Text(t.noModelSelected, textAlign: TextAlign.center)),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedTab,
         onDestinationSelected: (index) => setState(() => selectedTab = index),
