@@ -1,0 +1,15 @@
+name: odyn_diffusion_android
+description: Offline-first multilingual Android diffusion application.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+flutter:
+  uses-material-design: true
+  generate: true
