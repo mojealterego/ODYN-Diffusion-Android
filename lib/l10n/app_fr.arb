@@ -21,5 +21,10 @@
   "steps": "Étapes",
   "demoModel": "Modèle de démonstration",
   "noModelSelected": "Aucun modèle sélectionné. L’import sera bientôt disponible.",
-  "selectModelFirst": "Sélectionnez un modèle avant de générer."
+  "selectModelFirst": "Sélectionnez un modèle avant de générer.",
+  "importModel": "Importer un modèle",
+  "importingModel": "Importation du modèle…",
+  "importFailed": "Échec de l’importation",
+  "removeModel": "Supprimer le modèle",
+  "modelImported": "Modèle importé"
 }
