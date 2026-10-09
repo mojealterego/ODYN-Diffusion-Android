@@ -18,6 +18,13 @@ if [ -f /tmp/odyn-mainactivity-$$.kt ]; then
   mkdir -p "$(dirname "$host")"
   cp /tmp/odyn-mainactivity-$$.kt "$host"
 fi
+python3 - <<'PY'
+from pathlib import Path
+p = Path("android/app/src/main/AndroidManifest.xml")
+manifest = p.read_text()
+manifest = manifest.replace('android:name=".MainActivity"', 'android:name="com.mojealterego.odyn_diffusion_android.MainActivity"')
+p.write_text(manifest)
+PY
 flutter pub get
 flutter gen-l10n
 flutter analyze lib test
