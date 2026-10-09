@@ -21,5 +21,10 @@
   "steps": "Kroki",
   "demoModel": "Model demonstracyjny",
   "noModelSelected": "Nie wybrano modelu. Import modeli zostanie dodany.",
-  "selectModelFirst": "Wybierz model przed generowaniem."
+  "selectModelFirst": "Wybierz model przed generowaniem.",
+  "importModel": "Importuj model",
+  "importingModel": "Importowanie modelu…",
+  "importFailed": "Nie udało się zaimportować modelu",
+  "removeModel": "Usuń model",
+  "modelImported": "Model został zaimportowany"
 }
