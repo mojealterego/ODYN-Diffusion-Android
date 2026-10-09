@@ -1,0 +1,18 @@
+{
+  "@@locale": "pl",
+  "title": "ODYN Diffusion",
+  "image": "Obraz",
+  "video": "Wideo",
+  "models": "Modele",
+  "settings": "Ustawienia",
+  "language": "Język",
+  "systemLanguage": "Język systemowy",
+  "prompt": "Opis (prompt)",
+  "generate": "Generuj",
+  "notReady": "Natywny silnik generowania nie jest jeszcze podłączony.",
+  "polish": "Polski",
+  "english": "English",
+  "german": "Deutsch",
+  "spanish": "Español",
+  "french": "Français"
+}
