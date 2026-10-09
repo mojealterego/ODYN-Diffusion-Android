@@ -38,7 +38,8 @@ s = p.read_text()
 anchor = "android {"
 if anchor not in s:
     raise SystemExit("Unexpected Gradle layout")
-s = s.replace(anchor, """android {
+if "externalNativeBuild {" not in s:
+    s = s.replace(anchor, """android {
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
