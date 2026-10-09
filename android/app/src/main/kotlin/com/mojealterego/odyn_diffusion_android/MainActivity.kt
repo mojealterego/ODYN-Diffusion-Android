@@ -16,7 +16,7 @@ class MainActivity : FlutterActivity() {
 
     private external fun nativeLibraryLoaded(): Boolean
     private external fun nativeGenerateImage(
-        modelPath: String, prompt: String, width: Int, height: Int,
+        modelPath: String, vaePath: String?, textEncoderPath: String?, prompt: String, width: Int, height: Int,
         steps: Int, seed: Long, outputPath: String
     ): String?
     private external fun nativeCancel()
@@ -39,6 +39,8 @@ class MainActivity : FlutterActivity() {
                         } else {
                             val model = call.argument<String>("modelPath")
                             val prompt = call.argument<String>("prompt")
+                            val vaePath = call.argument<String>("vaePath")
+                            val textEncoderPath = call.argument<String>("textEncoderPath")
                             val width = call.argument<Int>("width") ?: 512
                             val height = call.argument<Int>("height") ?: 512
                             val steps = call.argument<Int>("steps") ?: 20
@@ -47,13 +49,15 @@ class MainActivity : FlutterActivity() {
                             if (model.isNullOrBlank() || prompt.isNullOrBlank() || frames != 1 ||
                                 width !in 64..2048 || height !in 64..2048 ||
                                 width % 8 != 0 || height % 8 != 0 || steps !in 1..150 ||
-                                !File(model).isFile) {
+                                !File(model).isFile ||
+                                (vaePath != null && !File(vaePath).isFile) ||
+                                (textEncoderPath != null && !File(textEncoderPath).isFile)) {
                                 result.error("INVALID_REQUEST", "Invalid image request or missing model", null)
                             } else {
                                 val output = File(cacheDir, "odyn-${System.nanoTime()}.png")
                                 worker.execute {
                                     try {
-                                        val path = nativeGenerateImage(model, prompt, width, height, steps, seed, output.absolutePath)
+                                        val path = nativeGenerateImage(model, vaePath, textEncoderPath, prompt, width, height, steps, seed, output.absolutePath)
                                         mainHandler.post {
                                             if (path == null) result.error("INFERENCE_FAILED", "Image generation failed", null)
                                             else result.success(path)
