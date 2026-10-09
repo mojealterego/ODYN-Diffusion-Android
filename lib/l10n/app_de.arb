@@ -20,7 +20,7 @@
   "height": "Höhe",
   "steps": "Schritte",
   "demoModel": "Demomodell",
-  "noModelSelected": "Kein Modell ausgewählt. Modellimport folgt.",
+  "noModelSelected": "Noch keine Modelle importiert.",
   "selectModelFirst": "Vor der Generierung ein Modell auswählen.",
   "importModel": "Modell importieren",
   "importingModel": "Modell wird importiert…",
