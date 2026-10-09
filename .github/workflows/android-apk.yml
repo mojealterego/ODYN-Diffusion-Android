@@ -15,15 +15,12 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Prepare Android host
-        shell: bash
+      - name: Install Android CMake and NDK
         run: |
-          set -euo pipefail
-          host=android/app/src/main/kotlin/com/mojealterego/odyn_diffusion_android/MainActivity.kt
-          cp "$host" /tmp/odyn-MainActivity.kt
-          flutter create --platforms=android --org com.mojealterego --project-name odyn_diffusion_android .
-          mkdir -p "$(dirname "$host")"
-          cp /tmp/odyn-MainActivity.kt "$host"
+          yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" "cmake;3.22.1" "ndk;27.0.12077973" || true
+      - name: Bootstrap Android native project
+        run: |
+          bash scripts/bootstrap_build_android.sh
       - name: Resolve dependencies
         run: flutter pub get
       - name: Generate localization
