@@ -7,12 +7,14 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : FlutterActivity() {
     private val channelName = "odyn.diffusion/native_v1"
     private val worker = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private var loaded = false
+    private val generating = AtomicBoolean(false)
 
     private external fun nativeLibraryLoaded(): Boolean
     private external fun nativeGenerateImage(
@@ -53,17 +55,23 @@ class MainActivity : FlutterActivity() {
                                 (vaePath != null && !File(vaePath).isFile) ||
                                 (textEncoderPath != null && !File(textEncoderPath).isFile)) {
                                 result.error("INVALID_REQUEST", "Invalid image request or missing model", null)
+                            } else if (!generating.compareAndSet(false, true)) {
+                                result.error("ENGINE_BUSY", "Generation already in progress", null)
                             } else {
-                                val output = File(cacheDir, "odyn-${System.nanoTime()}.png")
+                                val output = File(filesDir, "odyn-${System.nanoTime()}.png")
                                 worker.execute {
                                     try {
                                         val path = nativeGenerateImage(model, vaePath, textEncoderPath, prompt, width, height, steps, seed, output.absolutePath)
                                         mainHandler.post {
+                                            generating.set(false)
                                             if (path == null) result.error("INFERENCE_FAILED", "Image generation failed", null)
                                             else result.success(path)
                                         }
                                     } catch (e: Throwable) {
-                                        mainHandler.post { result.error("INFERENCE_FAILED", e.message, null) }
+                                        mainHandler.post {
+                                            generating.set(false)
+                                            result.error("INFERENCE_FAILED", e.message, null)
+                                        }
                                     }
                                 }
                             }
