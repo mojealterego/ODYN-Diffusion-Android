@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 
-void main() => runApp(const OdynApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const OdynApp());
+}
 
 class OdynApp extends StatefulWidget {
   const OdynApp({super.key});
@@ -11,7 +15,34 @@ class OdynApp extends StatefulWidget {
 }
 
 class _OdynAppState extends State<OdynApp> {
+  static const _localeKey = 'odyn.locale';
   Locale? selectedLocale;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocale();
+  }
+
+  Future<void> _loadLocale() async {
+    final preferences = await SharedPreferences.getInstance();
+    final code = preferences.getString(_localeKey);
+    if (!mounted || code == null) return;
+    if (AppLocalizations.supportedLocales.any((l) => l.languageCode == code)) {
+      setState(() => selectedLocale = Locale(code));
+    }
+  }
+
+  Future<void> _changeLocale(Locale? locale) async {
+    setState(() => selectedLocale = locale);
+    final preferences = await SharedPreferences.getInstance();
+    if (locale == null) {
+      await preferences.remove(_localeKey);
+    } else {
+      await preferences.setString(_localeKey, locale.languageCode);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -27,7 +58,7 @@ class _OdynAppState extends State<OdynApp> {
     theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
     home: Builder(builder: (context) => OdynHome(
       locale: selectedLocale,
-      onLocaleChanged: (value) => setState(() => selectedLocale = value),
+      onLocaleChanged: _changeLocale,
     )),
   );
 }
@@ -51,14 +82,28 @@ class _OdynHomeState extends State<OdynHome> {
       body: selectedTab == 3
         ? ListView(children: [
             ListTile(title: Text(t.language)),
-            DropdownButton<Locale?>(
-              value: widget.locale,
-              items: [
-                DropdownMenuItem<Locale?>(value: null, child: Text(t.systemLanguage)),
-                ...AppLocalizations.supportedLocales.map((locale) =>
-                  DropdownMenuItem<Locale?>(value: locale, child: Text(locale.languageCode.toUpperCase()))),
-              ],
-              onChanged: widget.onLocaleChanged,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: DropdownButton<Locale?>(
+                isExpanded: true,
+                value: widget.locale,
+                items: [
+                  DropdownMenuItem<Locale?>(value: null, child: Text(t.systemLanguage)),
+                  ...AppLocalizations.supportedLocales.map((locale) =>
+                    DropdownMenuItem<Locale?>(
+                      value: locale,
+                      child: Text(switch (locale.languageCode) {
+                        'pl' => t.polish,
+                        'en' => t.english,
+                        'de' => t.german,
+                        'es' => t.spanish,
+                        'fr' => t.french,
+                        _ => locale.languageCode,
+                      }),
+                    )),
+                ],
+                onChanged: widget.onLocaleChanged,
+              ),
             ),
           ])
         : Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
