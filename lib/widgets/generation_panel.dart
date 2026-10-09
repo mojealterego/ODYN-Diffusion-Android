@@ -57,8 +57,9 @@ class _GenerationPanelState extends State<GenerationPanel> {
 
   Future<void> _generate() async {
     if (running || !available || selectedId == null) return;
-    final model = models.where((m) => m.id == selectedId).firstOrNull;
-    if (model == null) return;
+    final selected = models.where((m) => m.id == selectedId);
+    if (selected.isEmpty) return;
+    final model = selected.first;
     final request = GenerationRequest(
       prompt: prompt.text,
       model: model,
@@ -80,6 +81,16 @@ class _GenerationPanelState extends State<GenerationPanel> {
       if (mounted) setState(() => error = e.toString());
     } finally {
       if (mounted) setState(() => running = false);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant GenerationPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isVideo != widget.isVideo) {
+      selectedId = null;
+      outputPath = null;
+      _refresh();
     }
   }
 
