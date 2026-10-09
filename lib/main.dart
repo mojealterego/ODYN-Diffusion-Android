@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'widgets/generation_panel.dart';
+import 'widgets/model_library_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,7 +109,7 @@ class _OdynHomeState extends State<OdynHome> {
           ])
         : selectedTab == 0 || selectedTab == 1
           ? GenerationPanel(isVideo: selectedTab == 1)
-          : Center(child: Text(t.noModelSelected, textAlign: TextAlign.center)),
+          : const ModelLibraryScreen(),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedTab,
         onDestinationSelected: (index) => setState(() => selectedTab = index),
