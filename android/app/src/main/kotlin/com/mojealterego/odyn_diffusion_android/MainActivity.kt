@@ -50,7 +50,7 @@ class MainActivity : FlutterActivity() {
                                 !File(model).isFile) {
                                 result.error("INVALID_REQUEST", "Invalid image request or missing model", null)
                             } else {
-                                val output = File(cacheDir, "odyn-${System.nanoTime()}.ppm")
+                                val output = File(cacheDir, "odyn-${System.nanoTime()}.png")
                                 worker.execute {
                                     try {
                                         val path = nativeGenerateImage(model, prompt, width, height, steps, seed, output.absolutePath)
