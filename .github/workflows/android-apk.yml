@@ -18,6 +18,12 @@ jobs:
       - name: Install Android CMake and NDK
         run: |
           "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install "cmake;3.22.1" "ndk;27.0.12077973"
+      - name: Verify Android toolchain
+        run: |
+          flutter doctor -v
+          java -version
+          test -d "${ANDROID_HOME}/ndk/27.0.12077973"
+          test -d "${ANDROID_HOME}/cmake/3.22.1"
       - name: Bootstrap, test and build Android ARM64
         run: bash scripts/bootstrap_build_android.sh
       - name: Publish debug APK
@@ -26,4 +32,4 @@ jobs:
           name: odyn-arm64-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
