@@ -4,14 +4,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Download source in CI before configuring this project.
-set(SDCPP_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../../third_party/stable-diffusion.cpp" CACHE PATH "stable-diffusion.cpp checkout")
+set(SDCPP_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../../../third_party/stable-diffusion.cpp" CACHE PATH "stable-diffusion.cpp checkout")
 if(NOT EXISTS "${SDCPP_SOURCE_DIR}/CMakeLists.txt")
   message(FATAL_ERROR "stable-diffusion.cpp checkout missing: ${SDCPP_SOURCE_DIR}")
 endif()
 
 set(SD_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SD_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
+set(SD_VULKAN OFF CACHE BOOL "" FORCE)
+set(SD_WEBP OFF CACHE BOOL "" FORCE)
+set(SD_WEBM OFF CACHE BOOL "" FORCE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory("${SDCPP_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/sdcpp")
 
 add_library(odyn_native SHARED odyn_native.cpp)
