@@ -1,0 +1,18 @@
+{
+  "@@locale": "es",
+  "title": "ODYN Diffusion",
+  "image": "Imagen",
+  "video": "Vídeo",
+  "models": "Modelos",
+  "settings": "Configuración",
+  "language": "Idioma",
+  "systemLanguage": "Idioma del sistema",
+  "prompt": "Instrucción",
+  "generate": "Generar",
+  "notReady": "El motor de inferencia nativo aún no está conectado.",
+  "polish": "Polski",
+  "english": "English",
+  "german": "Deutsch",
+  "spanish": "Español",
+  "french": "Français"
+}
