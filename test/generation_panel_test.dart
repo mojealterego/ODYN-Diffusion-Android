@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:odyn_diffusion_android/l10n/app_localizations.dart';
 import 'package:odyn_diffusion_android/widgets/generation_panel.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   Widget harness(Locale locale) => MaterialApp(
         locale: locale,
         supportedLocales: AppLocalizations.supportedLocales,
