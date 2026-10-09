@@ -43,7 +43,7 @@ class MainActivity : FlutterActivity() {
                             val height = call.argument<Int>("height") ?: 512
                             val steps = call.argument<Int>("steps") ?: 20
                             val frames = call.argument<Int>("frames") ?: 1
-                            val seed = call.argument<Long>("seed") ?: -1L
+                            val seed = (call.argument<Number>("seed"))?.toLong() ?: -1L
                             if (model.isNullOrBlank() || prompt.isNullOrBlank() || frames != 1 ||
                                 width !in 64..2048 || height !in 64..2048 ||
                                 width % 8 != 0 || height % 8 != 0 || steps !in 1..150 ||
@@ -58,7 +58,7 @@ class MainActivity : FlutterActivity() {
                                             if (path == null) result.error("INFERENCE_FAILED", "Image generation failed", null)
                                             else result.success(path)
                                         }
-                                    } catch (e: Exception) {
+                                    } catch (e: Throwable) {
                                         mainHandler.post { result.error("INFERENCE_FAILED", e.message, null) }
                                     }
                                 }
