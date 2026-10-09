@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'generation_engine.dart';
 
 /// Versioned contract for an Android host that bundles a real native engine.
-/// No native library is currently bundled: calls fail explicitly.
+/// The Android host loads the bundled stable-diffusion.cpp JNI library.
 class NativeEngineBridge implements GenerationEngine {
   NativeEngineBridge({MethodChannel? channel})
       : _channel = channel ?? const MethodChannel('odyn.diffusion/native_v1');
