@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "title": "ODYN Diffusion",
+  "image": "Image",
+  "video": "Video",
+  "models": "Models",
+  "settings": "Settings",
+  "language": "Language",
+  "systemLanguage": "System default",
+  "prompt": "Prompt",
+  "generate": "Generate",
+  "notReady": "Native inference engine is not connected yet.",
+  "polish": "Polski",
+  "english": "English",
+  "german": "Deutsch",
+  "spanish": "Español",
+  "french": "Français"
+}
