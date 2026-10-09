@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'model_manifest.dart';
@@ -32,7 +33,7 @@ class ModelImporter {
     final root = await getApplicationSupportDirectory();
     final folder = Directory('${root.path}/models');
     await folder.create(recursive: true);
-    final id = DateTime.now().microsecondsSinceEpoch.toString();
+    final id = '${DateTime.now().microsecondsSinceEpoch}-${Random.secure().nextInt(1 << 32)}';
     final target = File('${folder.path}/$id.$extension');
     try {
       await source.openRead().pipe(target.openWrite());
@@ -59,10 +60,15 @@ class ModelImporter {
     final root = await getApplicationSupportDirectory();
     final folder = Directory('${root.path}/models');
     final file = File(model.modelPath);
-    final parent = await file.parent.absolute.resolveSymbolicLinks();
+    if (!await folder.exists()) {
+      throw const FileSystemException('Model storage directory missing');
+    }
     final safeParent = await folder.absolute.resolveSymbolicLinks();
-    if (parent != safeParent) throw const FileSystemException('Refusing to delete external file');
-    await registry.remove(model.id);
+    final parent = await file.parent.absolute.resolveSymbolicLinks();
+    if (parent != safeParent || await FileSystemEntity.isLink(file.path)) {
+      throw const FileSystemException('Refusing to delete external or linked file');
+    }
     if (await file.exists()) await file.delete();
+    await registry.remove(model.id);
   }
 }
