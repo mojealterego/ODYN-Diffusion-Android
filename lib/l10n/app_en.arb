@@ -14,5 +14,12 @@
   "english": "English",
   "german": "Deutsch",
   "spanish": "Español",
-  "french": "Français"
+  "french": "Français",
+  "promptHint": "Describe the image",
+  "width": "Width",
+  "height": "Height",
+  "steps": "Steps",
+  "demoModel": "Demo model",
+  "noModelSelected": "No model selected. Model import is coming.",
+  "selectModelFirst": "Select a model before generating."
 }
