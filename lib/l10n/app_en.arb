@@ -21,5 +21,10 @@
   "steps": "Steps",
   "demoModel": "Demo model",
   "noModelSelected": "No model selected. Model import is coming.",
-  "selectModelFirst": "Select a model before generating."
+  "selectModelFirst": "Select a model before generating.",
+  "importModel": "Import model",
+  "importingModel": "Importing model…",
+  "importFailed": "Model import failed",
+  "removeModel": "Remove model",
+  "modelImported": "Model imported"
 }
