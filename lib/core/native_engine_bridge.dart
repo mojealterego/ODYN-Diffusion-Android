@@ -24,6 +24,9 @@ class NativeEngineBridge implements GenerationEngine {
   Future<String> generate(GenerationRequest request) async {
     final errors = request.validate();
     if (errors.isNotEmpty) throw ArgumentError(errors.join(', '));
+    if (request.frames != 1) {
+      throw UnsupportedError('Video generation is not implemented by the Android native engine');
+    }
     if (!await isAvailable()) {
       throw UnsupportedError('Native diffusion engine is not installed');
     }
