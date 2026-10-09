@@ -35,11 +35,14 @@ class ModelImporter {
     await folder.create(recursive: true);
     final id = '${DateTime.now().microsecondsSinceEpoch}-${Random.secure().nextInt(1 << 32)}';
     final target = File('${folder.path}/$id.$extension');
+    final staging = File('${target.path}.partial');
     try {
-      await source.openRead().pipe(target.openWrite());
-      if (await target.length() != await source.length()) {
+      final expectedLength = await source.length();
+      await source.openRead().pipe(staging.openWrite());
+      if (await staging.length() != expectedLength) {
         throw const FileSystemException('Incomplete model copy');
       }
+      await staging.rename(target.path);
       final model = ModelManifest(
         id: id,
         displayName: displayName,
@@ -50,6 +53,7 @@ class ModelImporter {
       await registry.add(model);
       return model;
     } catch (_) {
+      if (await staging.exists()) await staging.delete();
       if (await target.exists()) await target.delete();
       rethrow;
     }
